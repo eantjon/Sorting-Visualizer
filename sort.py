@@ -45,7 +45,7 @@ def draw(draw_info, algo_name, ascending):
 
     controls = draw_info.font.render("R - Reset | Space - Start Sorting | A - Ascending | D - Descending", 1, draw_info.black)
     draw_info.window.blit(controls, ( draw_info.width/2 - controls.get_width()/2 , 75))
-    sorting = draw_info.font.render("I - Insertion Sort | B - Bubble Sort", 1, draw_info.black)
+    sorting = draw_info.font.render("I - Insertion Sort | B - Bubble Sort | Q - Quick Sort | H - Heap Sort", 1, draw_info.black)
     draw_info.window.blit(sorting, ( draw_info.width/2 - sorting.get_width()/2 , 115))
     draw_list(draw_info)
     pygame.display.update()
@@ -113,6 +113,71 @@ def insertion_sort(draw_info, ascending=True):
 
 	return lst
 
+# def partition(array, begin, end):
+#     pivot = begin
+#     for i in range(begin+1, end+1):
+#         if array[i] <= array[begin]:
+#             pivot += 1
+#             array[i], array[pivot] = array[pivot], array[i]
+#     array[pivot], array[begin] = array[begin], array[pivot]
+#     return pivot
+# 
+# 
+# 
+# def quick_sort(draw_info, begin=0, end=None):
+#     lst = draw_info.lst
+# 
+#     if end is None:
+#         end = len(lst) - 1
+#     def _quicksort(lst, begin, end):
+#         if begin >= end:
+#             return
+#         pivot = partition(lst, begin, end)
+#         _quicksort(lst, begin, pivot-1)
+#         _quicksort(lst, pivot+1, end)
+#     return _quicksort(lst, begin, end)
+
+
+def heapify(arr, n, i):
+    largest = i  # Initialize largest as root
+    l = 2 * i + 1     # left = 2*i + 1
+    r = 2 * i + 2     # right = 2*i + 2
+  
+    # See if left child of root exists and is
+    # greater than root
+    if l < n and arr[i] < arr[l]:
+        largest = l
+  
+    # See if right child of root exists and is
+    # greater than root
+    if r < n and arr[largest] < arr[r]:
+        largest = r
+  
+    # Change root, if needed
+    if largest != i:
+        arr[i],arr[largest] = arr[largest],arr[i]  # swap
+  
+        # Heapify the root.
+        heapify(arr, n, largest)
+
+def heap_sort(draw_info, ascending=True):
+    lst = draw_info.lst
+    n = len(lst)
+  
+    # Build a maxheap.
+    # Since last parent will be at ((n//2)-1) we can start at that location.
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(lst, n, i)
+  
+    # One by one extract elements
+    for i in range(n-1, 0, -1):
+        lst[i], lst[0] = lst[0], lst[i]   # swap
+        draw_list(draw_info, {i: draw_info.green}, True)
+        yield True
+        heapify(lst, i, 0)
+    
+    return lst
+
 def main():
     run = True
     clock = pygame.time.Clock()
@@ -172,6 +237,14 @@ def main():
             elif event.key == pygame.K_i and not sorting:
                 sorting_algorithm = insertion_sort
                 sorting_algo_name = "Insertion Sort"
+            
+            elif event.key == pygame.K_q and not sorting:
+                sorting_algorithm = quick_sort
+                sorting_algo_name = "Quick Sort"
+
+            elif event.key == pygame.K_h and not sorting:
+                sorting_algorithm = heap_sort
+                sorting_algo_name = "Heap Sort"
 
     pygame.quit()
 
